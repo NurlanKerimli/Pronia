@@ -11,6 +11,12 @@
         public string SKU { get; set; }
         public int CategoryId {  get; set; }
         public Category Category { get; set; }
-        List<ProductImage>? ProductImages {  get; set; }
+        public List<ProductImage>? ProductImages {  get; set; }
+        public int ColorId { get; set; }
+        public Color Color { get; set; }
+        public List<Color> Colors { get; set; }
+        public int SizeId {  get; set; }
+        public Size Size { get; set; }
+        public List<Size> Sizes { get; set; }
     }
 }

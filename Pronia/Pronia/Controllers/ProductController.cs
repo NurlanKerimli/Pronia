@@ -20,7 +20,7 @@ namespace Pronia.Controllers
         public IActionResult Detail(int id)
         {
             if (id <= 0) return BadRequest();
-            Product product=_context.Products.Include(p=>p.Category).FirstOrDefault(P=>P.Id == id);
+            Product product=_context.Products.FirstOrDefault(P=>P.Id == id);
             if (product is null)return NotFound();
             
             return View(product);

@@ -1,7 +1,5 @@
-﻿@using Pronia.Models;
-@using Pronia.ViewModels;
+﻿
 @model HomeVM
-
       <!-- Begin Slider Area -->
       <div class="slider-area">
         <!-- Main Slider -->
@@ -1503,10 +1501,10 @@
                                         <div class="product-img">
                                             <a href="shop.html">
                                                 <img class="primary-img"
-                                                    @*  src="~/assets/images/website-images//@latest.Image1" *@
+                                                     src="~/assets/images/website-images/@latest.ProductImages.FirstOrDefault(pi=>pi.IsPrimary==true).Url"
                                                      alt="Product Images" />
                                                 <img class="secondary-img"
-                                                     @* src="~/assets/images/website-images//@latest.Image2" *@
+                                                     src="~/assets/images/website-images/@latest.ProductImages.FirstOrDefault(pi=>pi.IsPrimary==false).Url"
                                                      alt="Product Images" />
                                             </a>
                                             <div class="product-add-action">
@@ -1696,10 +1694,10 @@
                                 <div class="product-img">
                                     <a href="shop.html">
                                         <img class="primary-img"
-                                             @* src="~/assets/images/website-images//@product.Image1" *@
+                                             src="~/assets/images/website-images/@product.ProductImages.FirstOrDefault(pi=>pi.IsPrimary==true).Url"
                                              alt="Product Images" />
                                         <img class="secondary-img"
-                                             @* src="~/assets/images/website-images//@product.Image2" *@
+                                             src="~/assets/images/website-images//@product.ProductImages.FirstOrDefault(pi=>pi.IsPrimary==false).Url"
                                              alt="Product Images" />
                                     </a>
                                     <div class="product-add-action">
