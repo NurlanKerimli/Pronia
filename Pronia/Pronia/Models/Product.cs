@@ -12,11 +12,8 @@
         public int CategoryId {  get; set; }
         public Category Category { get; set; }
         public List<ProductImage>? ProductImages {  get; set; }
-        public int ColorId { get; set; }
-        public Color Color { get; set; }
-        public List<Color> Colors { get; set; }
-        public int SizeId {  get; set; }
-        public Size Size { get; set; }
-        public List<Size> Sizes { get; set; }
+        public List<ProductColor> ProductColor { get; set; }
+        public List<ProductSize> ProductSize { get; set; }
+        public List<ProductTag> ProductTag { get; set; }
     }
 }

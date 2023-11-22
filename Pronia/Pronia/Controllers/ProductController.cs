@@ -17,12 +17,12 @@ namespace Pronia.Controllers
         //{
         //    return View();
         //}
-        public IActionResult Detail(int id)
+        public async Task<IActionResult> Detail(int id)
         {
             if (id <= 0) return BadRequest();
-            Product product=_context.Products.FirstOrDefault(P=>P.Id == id);
-            if (product is null)return NotFound();
-            
+            Product product = await _context.Products.Include(p => p.ProductImages).FirstOrDefaultAsync(P => P.Id == id);
+            if (product is null) return NotFound();
+
             return View(product);
 
 

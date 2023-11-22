@@ -1501,10 +1501,10 @@
                                         <div class="product-img">
                                             <a href="shop.html">
                                                 <img class="primary-img"
-                                                     src="~/assets/images/website-images/@latest.ProductImages.FirstOrDefault(pi=>pi.IsPrimary==true).Url"
+                                                     src="~/assets/images/website-images/@latest.ProductImages.FirstOrDefault(pi=>pi.IsPrimary==true)?.Url"
                                                      alt="Product Images" />
                                                 <img class="secondary-img"
-                                                     src="~/assets/images/website-images/@latest.ProductImages.FirstOrDefault(pi=>pi.IsPrimary==false).Url"
+                                                     src="~/assets/images/website-images/@latest.ProductImages.FirstOrDefault(pi=>pi.IsPrimary==false)?.Url"
                                                      alt="Product Images" />
                                             </a>
                                             <div class="product-add-action">
@@ -1694,10 +1694,10 @@
                                 <div class="product-img">
                                     <a href="shop.html">
                                         <img class="primary-img"
-                                             src="~/assets/images/website-images/@product.ProductImages.FirstOrDefault(pi=>pi.IsPrimary==true).Url"
+                                             src="~/assets/images/website-images/@product.ProductImages.FirstOrDefault(pi=>pi.IsPrimary==true)?.Url"
                                              alt="Product Images" />
                                         <img class="secondary-img"
-                                             src="~/assets/images/website-images//@product.ProductImages.FirstOrDefault(pi=>pi.IsPrimary==false).Url"
+                                             src="~/assets/images/website-images/@product.ProductImages.FirstOrDefault(pi=>pi.IsPrimary==false)?.Url"
                                              alt="Product Images" />
                                     </a>
                                     <div class="product-add-action">
@@ -1717,7 +1717,7 @@
                                                 data-bs-toggle="modal"
                                                 data-bs-target="#quickModal">
                                                 <a href="#"
-                                                   data-tippy="Quickview"
+                                                   data-tippy="Quickview"f
                                                    data-tippy-inertia="true"
                                                    data-tippy-animation="shift-away"
                                                    data-tippy-delay="50"
