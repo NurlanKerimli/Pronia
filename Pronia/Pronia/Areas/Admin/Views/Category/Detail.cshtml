@@ -1,0 +1,25 @@
+﻿@model Category
+<div class="row">
+    @foreach (var item in Model.Products)
+    {
+        <div class="card" style="width: 18rem;">
+            <img src="@item.ProductImages" class="card-img-top" alt="...">
+            <div class="card-body">
+                <h5 class="card-title">Name:@item.Name</h5>
+                <p class="card-text">Description:@item.Description</p>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">SKU:@item.SKU</li>
+                <li class="list-group-item">Price:@item.Price</li>
+                <li class="list-group-item">Tags:@item.ProductTag</li>
+                <li class="list-group-item">Sizes:@item.ProductSize</li>
+                <li class="list-group-item">Colors:@item.ProductColor</li>
+
+            </ul>
+            <div class="card-body">
+                <a href="#" class="card-link">Card link</a>
+                <a href="#" class="card-link">Another link</a>
+            </div>
+        </div>
+    }
+</div>
