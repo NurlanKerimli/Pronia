@@ -1,22 +1,19 @@
 ﻿@model Slide
-<div class="row">
-	@foreach (var item in Model.Slides)
-	{
+
 		<div class="card" style="width: 18rem;">
-			<img src="@item.Image" class="card-img-top" alt="...">
+			<img src="@Model.Image" class="card-img-top" alt="...">
 			<div class="card-body">
-				<h5 class="card-title">Name:@item.Title</h5>
-				<h3 class="card-title">Name:@item.SubTitle</h3>
-				<p class="card-text">Description:@item.Description</p>
+				<h5 class="card-title">Title:@Model.Title</h5>
+				<h3 class="card-title">SubTitle:@Model.SubTitle</h3>
+				<p class="card-text">Description:@Model.Description</p>
 			</div>
 			<ul class="list-group list-group-flush">
-				<li class="list-group-item">SKU:@item.Order</li>
+				<li class="list-group-item">Order:@Model.Order</li>
 
 			</ul>
 			<div class="card-body">
-				<a href="#" class="card-link">Card link</a>
-				<a href="#" class="card-link">Another link</a>
+				<a asp-controller="category" asp-action="index"  class="btn btn-success">Cancel</a>
+				
 			</div>
 		</div>
-	}
-</div>
+
