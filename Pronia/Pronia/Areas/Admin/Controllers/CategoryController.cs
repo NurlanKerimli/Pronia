@@ -10,10 +10,12 @@ namespace Pronia.Areas.Admin.Controllers
     public class CategoryController : Controller
     {
         private readonly AppDbContext _context;
+        private readonly IWebHostEnvironment _env;
 
-        public CategoryController(AppDbContext context)
+        public CategoryController(AppDbContext context, IWebHostEnvironment env)
         {
             _context = context;
+            _env = env;
         }
         public async Task<IActionResult> Index()
         {
@@ -36,6 +38,8 @@ namespace Pronia.Areas.Admin.Controllers
             {
                 ModelState.AddModelError("Name", "This name is already available.");
             }
+
+            
             await _context.Categories.AddAsync(category);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
@@ -53,7 +57,7 @@ namespace Pronia.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> Update(int id, Category category)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return View();
             }
@@ -85,7 +89,9 @@ namespace Pronia.Areas.Admin.Controllers
         {
             if(id<=0) return BadRequest();
 
-			Category detail = await _context.Categories.FirstOrDefaultAsync(d => d.Id == id);
+			Category detail = await _context.Categories
+                .Include(x=>x.Products).ThenInclude(y=>y.ProductImages)
+                .FirstOrDefaultAsync(d => d.Id == id);
             if (detail==null) NotFound(); 
 
             

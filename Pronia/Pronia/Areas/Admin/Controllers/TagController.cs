@@ -80,6 +80,19 @@ namespace Pronia.Areas.Admin.Controllers
 			await _context.SaveChangesAsync();
 			return RedirectToAction(nameof(Index));
 		}
-	}
+
+        public async Task<IActionResult> Detail(int id)
+        {
+            if (id <= 0) return BadRequest();
+
+            Tag detail = await _context.Tags.FirstOrDefaultAsync(d => d.Id == id);
+            if (detail == null) NotFound();
+
+
+
+            return View(detail);
+
+        }
+    }
 }
 

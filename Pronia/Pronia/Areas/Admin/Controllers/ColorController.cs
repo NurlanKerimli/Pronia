@@ -41,6 +41,56 @@ namespace Pronia.Areas.Admin.Controllers
 			return RedirectToAction(nameof(Index));
 
 		}
-	}
+		public async Task<IActionResult> Update(int id)
+		{
+			if (id <= 0) return BadRequest();
+			Color color=await _context.Colors.FirstOrDefaultAsync(c => c.Id == id);
+			if (color is null) return NotFound();
+			return View(color);
+		}
+		[HttpPost]
+
+		public async Task<IActionResult> Update(int id,Color color)
+		{
+			if (!ModelState.IsValid)
+			{
+				return View();
+			}
+			Color existed= await _context.Colors.FirstOrDefaultAsync(c=>c.Id==id);
+			if (existed is null) return NotFound();
+
+            bool result = await _context.Categories.AnyAsync(c => c.Name == color.Name && c.Id == id);
+            if (result)
+            {
+                ModelState.AddModelError("Name", "This category already exist.");
+                return View();
+            }
+			existed.Name = color.Name;
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> Delete(int id)
+        {
+            if (id <= 0) return BadRequest();
+            Color existed = await _context.Colors.FirstOrDefaultAsync(t => t.Id == id);
+            if (existed == null) NotFound();
+            _context.Colors.Remove(existed);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> Detail(int id)
+        {
+            if (id <= 0) return BadRequest();
+
+            Color detail = await _context.Colors.FirstOrDefaultAsync(d => d.Id == id);
+            if (detail == null) NotFound();
+
+
+            return View(detail);
+
+        }
+    }
 }
 
