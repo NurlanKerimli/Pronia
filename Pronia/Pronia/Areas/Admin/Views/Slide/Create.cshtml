@@ -1,4 +1,4 @@
-﻿@model Slide
+﻿@model CreateSlideVM
 
 <div class="main-panel">
 	<div class="content-wrapper">
@@ -8,7 +8,7 @@
 				<div class="card">
 					<div class="card-body">
 						<h4 class="card-title">Create Slide</h4>
-						
+
 						<form class="forms-sample" method="post" enctype="multipart/form-data">
 							<div class="form-group">
 								<label asp-for="Photo">Photo</label>
@@ -36,7 +36,7 @@
 								<input asp-for="Description" class="form-control" placeholder="Description">
 								<span class="text-danger" asp-validation-for="Description"></span>
 							</div>
-							
+
 							<a asp-controller="Slide" asp-action="Create" class="btn btn-success">Create Slide</a>
 							<button type="submit" class="btn btn-primary mr-2">Submit</button>
 							<button class="btn btn-light">Cancel</button>

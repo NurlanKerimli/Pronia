@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Pronia.Areas.Admin.ViewModels;
 using Pronia.DAL;
 using Pronia.Models;
 
@@ -20,22 +21,31 @@ namespace Pronia.Areas.Admin.Controllers
 			List<Color> colors = await _context.Colors.ToListAsync();
 			return View(colors);
 		}
-		public IActionResult Create()
+		public async Task<IActionResult> Create()
 		{
+			ViewBag.Colors = await _context.Colors.ToListAsync();
 			return View();
 		}
 		[HttpPost]
-		public async Task<IActionResult> Create(Color color)
+		public async Task<IActionResult> Create(CreateColorVM colorVM)
 		{
 			if (!ModelState.IsValid)
 			{
-				return View(color);
+				ViewBag.Colors = await _context.Colors.ToListAsync();
+				return View();
 			}
-			bool result = _context.Colors.Any(c => c.Name.Trim() == color.Name.Trim());
+			bool result = _context.Colors.Any(c => c.Name.Trim() == colorVM.Name.Trim());
 			if (result)
 			{
+				ViewBag.Colors = await _context.Colors.ToListAsync();
 				ModelState.AddModelError("Name", "This name is already available.");
+				return View();
 			}
+			Color color = new Color()
+			{
+				Name = colorVM.Name,
+			};
+
 			await _context.Colors.AddAsync(color);
 			await _context.SaveChangesAsync();
 			return RedirectToAction(nameof(Index));
@@ -44,13 +54,13 @@ namespace Pronia.Areas.Admin.Controllers
 		public async Task<IActionResult> Update(int id)
 		{
 			if (id <= 0) return BadRequest();
-			Color color=await _context.Colors.FirstOrDefaultAsync(c => c.Id == id);
-			if (color is null) return NotFound();
-			return View(color);
+			Color existed=await _context.Colors.FirstOrDefaultAsync(c => c.Id == id);
+			if (existed is null) return NotFound();
+			return View(existed);
 		}
 		[HttpPost]
 
-		public async Task<IActionResult> Update(int id,Color color)
+		public async Task<IActionResult> Update(int id,CreateColorVM colorVM)
 		{
 			if (!ModelState.IsValid)
 			{
@@ -59,13 +69,14 @@ namespace Pronia.Areas.Admin.Controllers
 			Color existed= await _context.Colors.FirstOrDefaultAsync(c=>c.Id==id);
 			if (existed is null) return NotFound();
 
-            bool result = await _context.Categories.AnyAsync(c => c.Name == color.Name && c.Id == id);
+            bool result = await _context.Categories.AnyAsync(c => c.Name == existed.Name && c.Id == id);
             if (result)
             {
-                ModelState.AddModelError("Name", "This category already exist.");
+				ViewBag.Colors = await _context.Colors.ToListAsync();
+				ModelState.AddModelError("Name", "This category already exist.");
                 return View();
             }
-			existed.Name = color.Name;
+			existed.Name = colorVM.Name;
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }

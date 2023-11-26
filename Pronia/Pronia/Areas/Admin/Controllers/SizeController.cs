@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Pronia.Areas.Admin.ViewModels;
+using Pronia.Areas.Admin.ViewModels.Size;
 using Pronia.DAL;
 using Pronia.Models;
 
@@ -19,22 +21,30 @@ namespace Pronia.Areas.Admin.Controllers
 			List<Size> sizes = await _context.Sizes.ToListAsync();
 			return View(sizes);
 		}
-		public IActionResult Create()
+		public async Task<IActionResult> Create()
 		{
+			ViewBag.Sizes = await _context.Sizes.ToListAsync();
 			return View();
 		}
 		[HttpPost]
-		public async Task<IActionResult> Create(Size size)
+		public async Task<IActionResult> Create(CreateSizeVM sizeVM)
 		{
 			if (!ModelState.IsValid)
 			{
-				return View(size);
+				ViewBag.Sizes=await _context.Sizes.ToListAsync();
+				return View();
 			}
-			bool result = _context.Sizes.Any(c => c.Name.Trim() == size.Name.Trim());
-			if (result)
+			bool result = _context.Sizes.Any(c => c.Name.Trim() == sizeVM.Name.Trim());
+			if (!result)
 			{
+				ViewBag.Sizes = await _context.Sizes.ToListAsync();
 				ModelState.AddModelError("Name", "This name is already available.");
+				return View();
 			}
+			Size size = new Size()
+			{
+				Name = sizeVM.Name,
+			};
 			await _context.Sizes.AddAsync(size);
 			await _context.SaveChangesAsync();
 			return RedirectToAction(nameof(Index));
@@ -44,27 +54,29 @@ namespace Pronia.Areas.Admin.Controllers
 		public async Task<IActionResult> Update(int id)
 		{
 			if (id<=0) return BadRequest();
-			Size size=await _context.Sizes.FirstOrDefaultAsync(s=>s.Id==id);
-			if(size is null) return NotFound();
-			return View(size);
+			Size existed=await _context.Sizes.FirstOrDefaultAsync(s=>s.Id==id);
+			if(existed is null) return NotFound();
+			return View(existed);
 		}
 		[HttpPost]
-		public async Task<IActionResult> Update(int id, Size size)
+		public async Task<IActionResult> Update(int id, UpdateSizeVM sizeVM)
 		{
 			if (!ModelState.IsValid)
 			{
+				ViewBag.Sizes = await _context.Sizes.ToListAsync();
 				return View();
 			}
 			Size existed = await _context.Sizes.FirstOrDefaultAsync(s => s.Id == id);
 			if (existed is null) return NotFound();
 
-			bool result = await _context.Categories.AnyAsync(c => c.Name == size.Name && c.Id == id);
+			bool result = await _context.Categories.AnyAsync(c => c.Name == sizeVM.Name && c.Id == id);
 			if (result)
 			{
+				ViewBag.Sizes = await _context.Sizes.ToListAsync();
 				ModelState.AddModelError("Name", "This category already exist.");
 				return View();
 			}
-			existed.Name = size.Name;
+			existed.Name = sizeVM.Name;
 			await _context.SaveChangesAsync();
 			return RedirectToAction(nameof(Index));
 		}

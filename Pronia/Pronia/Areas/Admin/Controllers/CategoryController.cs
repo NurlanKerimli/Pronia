@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
+using Pronia.Areas.Admin.ViewModels;
+using Pronia.Areas.Admin.ViewModels.Category;
 using Pronia.DAL;
 using Pronia.Models;
 
@@ -10,34 +12,39 @@ namespace Pronia.Areas.Admin.Controllers
     public class CategoryController : Controller
     {
         private readonly AppDbContext _context;
-        private readonly IWebHostEnvironment _env;
-
-        public CategoryController(AppDbContext context, IWebHostEnvironment env)
+        public CategoryController(AppDbContext context)
         {
             _context = context;
-            _env = env;
         }
         public async Task<IActionResult> Index()
         {
             List<Category> categories= await _context.Categories.ToListAsync();
             return View(categories);
         }
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View();
+			ViewBag.Categories = await _context.Categories.ToListAsync();
+			return View();
         }
         [HttpPost]
-        public async Task<IActionResult> Create(Category category)
+        public async Task<IActionResult> Create(CreateCategoryVM categoryVM)
         {
             if(!ModelState.IsValid)
             {
-                return View(category);
+                ViewBag.Categories=await _context.Categories.ToListAsync();
+                return View();
             }
-            bool result = _context.Categories.Any(c=>c.Name.Trim()==category.Name.Trim());
-            if (result)
+            bool result = _context.Categories.Any(c=>c.Name.Trim()== categoryVM.Name.Trim());
+            if (!result)
             {
-                ModelState.AddModelError("Name", "This name is already available.");
+				ViewBag.Categories = await _context.Categories.ToListAsync();
+				ModelState.AddModelError("Name", "This name is already available.");
+                return View();
             }
+            Category category = new Category()
+            {
+                Name = categoryVM.Name,
+            };
 
             
             await _context.Categories.AddAsync(category);
@@ -49,28 +56,34 @@ namespace Pronia.Areas.Admin.Controllers
         public async Task<IActionResult>Update(int id)
         {
             if(id<=0)return BadRequest();
-            Category category= await _context.Categories.FirstOrDefaultAsync(c=>c.Id==id);
+            Category existed= await _context.Categories.FirstOrDefaultAsync(c=>c.Id==id);
 
-            if (category==null) NotFound();
-            return View(category);
+            if (existed==null) NotFound();
+            UpdateCategoryVM categoryVM = new UpdateCategoryVM()
+            {
+                Name = existed.Name
+            };
+            return View(categoryVM);
         }
         [HttpPost]
-        public async Task<IActionResult> Update(int id, Category category)
+        public async Task<IActionResult> Update(int id, CreateCategoryVM categoryVM)
         {
             if (!ModelState.IsValid)
             {
-                return View();
+				ViewBag.Categories = await _context.Categories.ToListAsync();
+				return View(categoryVM);
             }
             Category existed=await _context.Categories.FirstOrDefaultAsync(c=>c.Id == id);
             if (existed==null) NotFound();
 
-            bool result= await _context.Categories.AnyAsync(c=>c.Name==category.Name && c.Id==id);
+            bool result= await _context.Categories.AnyAsync(c=>c.Name== categoryVM.Name && c.Id==id);
             if (result)
             {
-                ModelState.AddModelError("Name", "This category already exist.");
+				ViewBag.Categories = await _context.Categories.ToListAsync();
+				ModelState.AddModelError("Name", "This category already exist.");
                 return View();
             }
-            existed.Name= category.Name;
+            existed.Name= categoryVM.Name;
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }

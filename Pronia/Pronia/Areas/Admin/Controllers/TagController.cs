@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
+using Pronia.Areas.Admin.ViewModels;
+using Pronia.Areas.Admin.ViewModels.Tag;
 using Pronia.DAL;
 using Pronia.Models;
 
@@ -20,53 +22,64 @@ namespace Pronia.Areas.Admin.Controllers
 			List<Tag> tags = await _context.Tags.ToListAsync();
 			return View(tags);
 		}
-		public IActionResult Create()
+		public async Task<IActionResult> Create()
 		{
+			ViewBag.Tags = await _context.Tags.ToListAsync();
 			return View();
 		}
 		[HttpPost]
-		public async Task<IActionResult> Create(Tag tag)
+		public async Task<IActionResult> Create(CreateTagVM tagVM)
 		{
 			if (!ModelState.IsValid)
 			{
-				return View(tag);
+				ViewBag.Tags=await _context.Tags.ToListAsync();
+				return View();
 			}
-			bool result = _context.Tags.Any(c => c.Name.Trim() == tag.Name.Trim());
-			if (result)
+			bool result = _context.Tags.Any(c => c.Name.Trim() == tagVM.Name.Trim());
+			if (!result)
 			{
+				ViewBag.Tags = await _context.Tags.ToListAsync();
 				ModelState.AddModelError("Name", "This name is already available.");
 			}
+			Tag tag = new Tag()
+			{
+				Name = tagVM.Name,
+			};
+
 			await _context.Tags.AddAsync(tag);
 			await _context.SaveChangesAsync();
 			return RedirectToAction(nameof(Index));
 		}
-
-
 		public async Task<IActionResult> Update(int id)
 		{
 			if (id <= 0) return BadRequest();
           
-			Tag tag = await _context.Tags.FirstOrDefaultAsync(t => t.Id== id);
+			Tag existed = await _context.Tags.FirstOrDefaultAsync(t => t.Id== id);
             
-			if (tag == null) NotFound();
-			return View(tag);
+			if (existed == null) NotFound();
+			UpdateTagVM tagVM = new UpdateTagVM()
+			{
+				Name = existed.Name,
+			};
+			return View(tagVM);
 		
 		}
 		[HttpPost]
 
-		public async Task<IActionResult> Update(int id,Tag tag)
+		public async Task<IActionResult> Update(int id, UpdateTagVM tagVM)
 		{
 			if(ModelState.IsValid)return View();
 			Tag existed=await _context.Tags.FirstOrDefaultAsync(t=>t.Id==id);
 			if (existed == null) NotFound();
 
-			bool result=await _context.Tags.AnyAsync(t=>t.Name==tag.Name && t.Id==id);
+			bool result=await _context.Tags.AnyAsync(t=>t.Name==tagVM.Name && t.Id==id);
 			if (result)
 			{
+				ViewBag.Tags = await _context.Tags.ToListAsync();
 				ModelState.AddModelError("Name", "This category already exist.");
 				return View();
 			}
-			existed.Name = tag.Name;
+			existed.Name = tagVM.Name;
 			await _context.SaveChangesAsync();
 			return RedirectToAction(nameof(Index));
 

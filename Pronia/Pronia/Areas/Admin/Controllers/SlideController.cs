@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Pronia.Areas.Admin.ViewModels;
 using Pronia.DAL;
 using Pronia.Models;
 using Pronia.Utilities.Extensions;
@@ -28,27 +29,36 @@ namespace Pronia.Areas.Admin.Controllers
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> Create(Slide slide)
+		public async Task<IActionResult> Create(CreateSlideVM slideVM)
 		{
-			if(slide.Photo is null)
+			
+
+			if (!ModelState.IsValid)
 			{
-				ModelState.AddModelError("Photo", "Please enter a picture.");
 				return View();
 			}
-			if (!slide.Photo.ValidateType("images/")) 
+			if (!slideVM.Photo.ValidateType("images/")) 
 			{
 				ModelState.AddModelError("Photo", "The file type is not compatible.");
 				return View();
 			}
-			if(slide.Photo.ValidateSize(2 * 1024))
+			if(slideVM.Photo.ValidateSize(2 * 1024))
 			{
 				ModelState.AddModelError("Photo", "File size should not exceed 2 megabytes.");
 				return View();
 			}
 
-			slide.Image =await slide.Photo.CreateFileAsync(_env.WebRootPath, "assets", "images","slider");
-
-			await _context.AddAsync(slide);
+            string fileName =await slideVM.Photo.CreateFileAsync(_env.WebRootPath, "assets", "images","slider");
+			Slide slide = new Slide()
+			{
+				Image = fileName,
+				Title = slideVM.Title,
+				SubTitle = slideVM.SubTitle,
+				Description = slideVM.Description,
+				Order = slideVM.Order,
+				
+			};
+			await _context.AddAsync(slideVM);
 			await _context.SaveChangesAsync();
 			return RedirectToAction(nameof(Index));
 		}
@@ -58,38 +68,47 @@ namespace Pronia.Areas.Admin.Controllers
 			Slide existed =await _context.Slides.FirstOrDefaultAsync(s => s.Id == id);
 			if(existed is null) return NotFound();
 
-			return View(existed);
+			UpdateSlideVM slideVM = new UpdateSlideVM()
+			{
+				Title = existed.Title,
+				SubTitle = existed.SubTitle,
+				Description = existed.Description,
+				Image = existed.Image,
+				Order = existed.Order,
+			};
+			return View(slideVM);
 		}
 		[HttpPost]
 
-		public async Task<IActionResult> Update(int id,Slide slide)
+		public async Task<IActionResult> Update(int id,UpdateSlideVM slideVM)
 		{
-			Slide existed=await _context.Slides.FirstOrDefaultAsync(s=>s.Id == id);	
-			if(existed is null) return NotFound();
+			
 			if(!ModelState.IsValid)
 			{
-				return View(existed);
+				return View(slideVM);
 			}
-			if(slide.Photo is not null)
+            Slide existed = await _context.Slides.FirstOrDefaultAsync(s => s.Id == id);
+            if (existed is null) return NotFound();
+            if (slideVM.Photo is not null)
 			{
-				if (!slide.Photo.ValidateType("images/"))
+				if (!slideVM.Photo.ValidateType("images/"))
 				{
 					ModelState.AddModelError("Photo", "The file type is not compatible.");
-					return View(existed);
+					return View(slideVM);
 				}
-				if (slide.Photo.ValidateSize(2 * 1024))
+				if (slideVM.Photo.ValidateSize(2 * 1024))
 				{
 					ModelState.AddModelError("Photo", "File size should not exceed 2 megabytes.");
-					return View(existed);
+					return View(slideVM);
 				}
-				string fileName = await slide.Photo.CreateFileAsync(_env.WebRootPath, "assets", "images", "slider");
+				string fileName = await slideVM.Photo.CreateFileAsync(_env.WebRootPath, "assets", "images", "slider");
 				existed.Image.DeleteFile(_env.WebRootPath,"assets","images","slider");
 				existed.Image = fileName;
 			}
-			existed.Title = slide.Title;
-			existed.SubTitle = slide.SubTitle;
-			existed.Description = slide.Description;
-			existed.Order = slide.Order;
+			existed.Title = slideVM.Title;
+			existed.SubTitle = slideVM.SubTitle;
+			existed.Description = slideVM.Description;
+			existed.Order = slideVM.Order;
 			await _context.SaveChangesAsync();
 			return RedirectToAction(nameof(Index));
 		}
@@ -100,7 +119,7 @@ namespace Pronia.Areas.Admin.Controllers
 			Slide existed=await _context.Slides.FirstOrDefaultAsync(s=>s.Id==id);
 			if(existed == null) return NotFound();
 
-			existed.Image.DeleteFile(_env.WebRootPath,"assets","images","slides");
+			existed.Image.DeleteFile(_env.WebRootPath,"assets","images","slider");
 			_context.Slides.Remove(existed);
 			await _context.SaveChangesAsync();
 			return RedirectToAction(nameof(Index));
@@ -111,7 +130,8 @@ namespace Pronia.Areas.Admin.Controllers
         {
             if (id <= 0) return BadRequest();
 
-            Slide detail = await _context.Slides.FirstOrDefaultAsync(s => s.Id == id);
+            Slide detail = await _context.Slides
+				.FirstOrDefaultAsync(s => s.Id == id);
             if (detail == null) NotFound();
 
             return View(detail);
