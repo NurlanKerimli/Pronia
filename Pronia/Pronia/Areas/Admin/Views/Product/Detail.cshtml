@@ -1,0 +1,22 @@
+﻿@model Product
+
+<div class="card" style="width: 18rem;">
+	<img src="@Model.ProductImages" class="card-img-top" alt="...">
+	<div class="card-body">
+		<h5 class="card-title">Title:@Model.Name</h5>
+		<h3 class="card-title">SubTitle:@Model.Price</h3>
+		<p class="card-text">Description:@Model.Description</p>
+	</div>
+	<ul class="list-group list-group-flush">
+		<li class="list-group-item">Order:@Model.SKU</li>
+		<li class="list-group-item">Order:@Model.ProductSize</li>
+		<li class="list-group-item">Order:@Model.ProductTag</li>
+		<li class="list-group-item">Order:@Model.ProductColor</li>
+
+	</ul>
+	<div class="card-body">
+		<a asp-controller="Product" asp-action="index" class="btn btn-success">Cancel</a>
+
+	</div>
+</div>
+

@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Pronia.Areas.Admin.ViewModels.Product
+namespace Pronia.Areas.Admin.ViewModels
+
 {
 	public class UpdateProductVM
 	{
@@ -11,5 +12,8 @@ namespace Pronia.Areas.Admin.ViewModels.Product
 		public IFormFile Photo { get; set; }
 		[Required]
 		public int? CategoryId { get; set; }
+		List<int> TagIds { get; set; }
+		public List<Category>? Categories { get; set; }
+		public List<Tag>? Tags { get; set; }
 	}
 }

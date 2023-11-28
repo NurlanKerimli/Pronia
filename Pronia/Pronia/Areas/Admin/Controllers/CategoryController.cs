@@ -70,7 +70,7 @@ namespace Pronia.Areas.Admin.Controllers
         {
             if (!ModelState.IsValid)
             {
-				ViewBag.Categories = await _context.Categories.ToListAsync();
+				categoryVM.Categories = await _context.Categories.ToListAsync();
 				return View(categoryVM);
             }
             Category existed=await _context.Categories.FirstOrDefaultAsync(c=>c.Id == id);

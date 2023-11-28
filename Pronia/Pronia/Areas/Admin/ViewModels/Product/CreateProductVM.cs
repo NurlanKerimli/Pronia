@@ -12,5 +12,6 @@ namespace Pronia.Areas.Admin.ViewModels
 		public IFormFile Photo { get; set; }
 		[Required]
 		public int? CategoryId { get; set; }
+		public List<int> TagIds {  get; set; }
 	}
 }
