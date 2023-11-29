@@ -153,7 +153,7 @@ namespace Pronia.Areas.Admin.Controllers
                 product.ProductImages.Add(new ProductImage
                 {
                     IsPrimary = null,
-                    Alternative = product.Name,
+                    Alternative = productVM.Name,
                     Url = await photo.CreateFileAsync(_env.WebRootPath, "assets", "images", "website-images")
                 });
             }
@@ -164,7 +164,7 @@ namespace Pronia.Areas.Admin.Controllers
 					if (!await _context.Tags.AnyAsync(x => x.Id == item))
 					{
 						ModelState.AddModelError("TagIds", "This tag is not exist");
-						productVM.Categories = await _context.Categories.ToListAsync(); //Müəllim nəyə görə biz burda eyni vaxtda həm categories hem de tagı yoxlayırıq.// 
+						productVM.Categories = await _context.Categories.ToListAsync(); 
 						productVM.Tags = await _context.Tags.ToListAsync();
 
 						return View(productVM);
@@ -183,7 +183,7 @@ namespace Pronia.Areas.Admin.Controllers
 
         public async Task<IActionResult> Update(int id)
         {
-            Product existed = await _context.Products.Include(p=>p.ProductTags).FirstOrDefaultAsync(p=> p.Id ==id);
+            Product existed = await _context.Products.Include(p=>p.ProductImages).Include(p=>p.ProductTags).FirstOrDefaultAsync(p=> p.Id ==id);
             if (existed == null) return NotFound();
 
             UpdateProductVM productVM = new UpdateProductVM()
@@ -193,6 +193,7 @@ namespace Pronia.Areas.Admin.Controllers
                 Description = existed.Description,
                 SKU = existed.SKU,
                 CategoryId = existed.CategoryId,
+                ProductImages = existed.ProductImages,
                 TagIds=existed.ProductTags.Select(p=>p.TagId).ToList(),
                 Categories = await _context.Categories.ToListAsync(),
                 Tags=await _context.Tags.ToListAsync(),
@@ -203,15 +204,45 @@ namespace Pronia.Areas.Admin.Controllers
 
         public async Task<IActionResult> Update(int id,UpdateProductVM productVM)
         {
-            if(!ModelState.IsValid)
+			Product existed = await _context.Products.Include(p=>p.ProductImages).Include(p => p.ProductTags).FirstOrDefaultAsync(p => p.Id == id);
+
+			productVM.Categories = await _context.Categories.ToListAsync();
+			productVM.Tags = await _context.Tags.ToListAsync();
+			productVM.ProductImages = existed.ProductImages;
+			if (!ModelState.IsValid)
             {
-				productVM.Categories = await _context.Categories.ToListAsync();
-                productVM.Tags=await _context.Tags.ToListAsync();
 				return View(productVM);
             }
-            Product existed= await _context.Products.Include(p=>p.ProductTags).FirstOrDefaultAsync(p=> p.Id == id);
             if (existed == null) return NotFound();
-            bool result = await _context.Categories.AnyAsync(c => c.Id == productVM.CategoryId);
+            if (productVM.MainPhoto is not null)
+            {
+				if (!productVM.MainPhoto.ValidateType("image/"))
+				{
+					ModelState.AddModelError("MainPhoto", "Invalid file type.");
+					return View(productVM);
+				}
+
+				if (!productVM.MainPhoto.ValidateSize(600))
+				{
+					ModelState.AddModelError("MainPhoto", "The file size is not appropriate");
+                    return View(productVM);
+                }
+			}
+			if (productVM.HoverPhoto is not null)
+			{
+				if (!productVM.HoverPhoto.ValidateType("image/"))
+				{
+					ModelState.AddModelError("HoverPhoto", "Invalid file type.");
+					return View(productVM);
+				}
+
+				if (!productVM.HoverPhoto.ValidateSize(600))
+				{
+					ModelState.AddModelError("HoverPhoto", "The file size is not appropriate");
+					return View(productVM);
+				}
+			}
+			bool result = await _context.Categories.AnyAsync(c => c.Id == productVM.CategoryId);
             if(!result)
             {
                 ModelState.AddModelError("CategoryId", "The categoryid is not exist.");
@@ -227,13 +258,73 @@ namespace Pronia.Areas.Admin.Controllers
                 {
 					productVM.Categories = await _context.Categories.ToListAsync();
 					productVM.Tags = await _context.Tags.ToListAsync();
+                    productVM.ProductImages=existed.ProductImages;
                     ModelState.AddModelError("TagIds", "The Tag is not exist.");
 
 					return View(productVM);
                 }
                 existed.ProductTags.Add(new ProductTag { TagId = tId });
             }
-            existed.Name = productVM.Name;
+            if(productVM.MainPhoto != null)
+            {
+                string fileName = await productVM.MainPhoto.CreateFileAsync(_env.WebRootPath, "assets", "images", "website-images");
+                ProductImage existedImg=existed.ProductImages.FirstOrDefault(pi=>pi.IsPrimary==true);
+                existedImg.Url.DeleteFile(_env.WebRootPath, "assets", "images", "website-images");
+                existed.ProductImages.Remove(existedImg);
+
+                existed.ProductImages.Add(new ProductImage
+                {
+                    IsPrimary = true,
+                    Alternative = productVM.Name,
+                    Url = fileName
+                });
+            }
+
+            if(productVM.HoverPhoto != null)
+            {
+                string fileName = await productVM.HoverPhoto.CreateFileAsync(_env.WebRootPath, "assets", "images", "website-images");
+                ProductImage existedImg=existed.ProductImages.FirstOrDefault(pi=>pi.IsPrimary==false);
+                existedImg.Url.DeleteFile(_env.WebRootPath, "assets", "images", "website-images");
+                existed.ProductImages.Remove(existedImg);
+                existed.ProductImages.Add(new ProductImage
+                {
+                    IsPrimary=false,
+                    Alternative = productVM.Name,
+                    Url = fileName
+                });
+            }
+            if(productVM.TagIds is null)
+            {
+                productVM.ImageIds = new List<int>();
+            }
+            List<ProductImage> removeable = existed.ProductImages.Where(pi => !productVM.ImageIds.Exists(imgId => imgId=pi.Id)&&pi.IsPrimary==true).ToList();
+            foreach(ProductImage removedImg in removeable)
+            {
+                removedImg.Url.DeleteFile(_env.WebRootPath, "assets", "images", "website-images");
+                existed.ProductImages.Remove(removedImg);
+            }
+			TempData["Message"] = "";
+			foreach (IFormFile photo in productVM.Photos ?? new List<IFormFile>())
+			{
+				if (!photo.ValidateType("image/"))
+				{
+					TempData["Message"] += $"<p class=\"text-danger\">{photo.FileName} file type does not match</p>";
+					continue;
+				}
+				if (!productVM.HoverPhoto.ValidateSize(600))
+				{
+					TempData["Message"] += $"<p class=\"text-danger\">{photo.FileName} file size is not appropriate</p>";
+					continue;
+				}
+
+				existed.ProductImages.Add(new ProductImage
+				{
+					IsPrimary = null,
+					Alternative = productVM.Name,
+					Url = await photo.CreateFileAsync(_env.WebRootPath, "assets", "images", "website-images")
+				});
+			}
+			existed.Name = productVM.Name;
             existed.Price = productVM.Price;
             existed.Description = productVM.Description;
             existed.SKU = productVM.SKU;
@@ -243,16 +334,20 @@ namespace Pronia.Areas.Admin.Controllers
 
         public async Task<IActionResult> Delete(int id)
         {
-            Product existed=await _context.Products.FirstOrDefaultAsync(p=>p.Id==id);
+            if (id <= 0) return BadRequest();
+            Product existed=await _context.Products.Include(p=>p.ProductImages.ToList()).FirstOrDefaultAsync(p=>p.Id==id);
             if (existed==null) return NotFound();
-
-			//existed.ProductImages.DeleteFile(_env.WebRootPath, "assets", "images", "web-images");
+            foreach (ProductImage image in existed.ProductImages ?? new List<ProductImage>())
+            {
+                image.Url.DeleteFile(_env.WebRootPath, "assets", "images", "website-images");
+            }
+            
 			_context.Products.Remove(existed);
 			await _context.SaveChangesAsync();
 			return RedirectToAction(nameof(Index));
 		}
 
-		public async Task<IActionResult> Detail(int id)
+		public  async Task<IActionResult> Detail(int id)
 		{
 			if (id <= 0) return BadRequest();
 
