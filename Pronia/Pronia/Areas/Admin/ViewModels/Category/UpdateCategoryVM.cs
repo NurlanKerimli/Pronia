@@ -1,4 +1,4 @@
-﻿namespace Pronia.Areas.Admin.ViewModels.Category
+﻿namespace Pronia.Areas.Admin.ViewModels
 {
 	public class UpdateCategoryVM
 	{

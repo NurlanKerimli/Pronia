@@ -1,4 +1,4 @@
-﻿namespace Pronia.Areas.Admin.ViewModels.Tag
+﻿namespace Pronia.Areas.Admin.ViewModels
 {
 	public class UpdateTagVM
 	{

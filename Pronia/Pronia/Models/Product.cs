@@ -12,6 +12,6 @@
         public List<ProductImage>? ProductImages {  get; set; }
         public List<ProductColor> ProductColor { get; set; }
         public List<ProductSize> ProductSize { get; set; }
-        public List<ProductTag> ProductTag { get; set; }
+        public List<ProductTag> ProductTags { get; set; }
     }
 }

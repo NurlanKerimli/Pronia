@@ -32,6 +32,9 @@ namespace Pronia.Areas.Admin.Controllers
 
         public async Task<IActionResult> Create()
         {
+            CreateProductVM productVM = new CreateProductVM();
+           
+
             productVM.Categories = await _context.Categories.ToListAsync();
             productVM.Tags= await _context.Tags.ToListAsync();
             return View();
@@ -42,7 +45,8 @@ namespace Pronia.Areas.Admin.Controllers
             if(!ModelState.IsValid)
             {
 				productVM.Categories = await _context.Categories.ToListAsync();
-                return View();
+                productVM.Tags = await _context.Tags.ToListAsync();
+                return View(productVM);
             }
             bool result = await _context.Categories.AnyAsync(c => c.Id == productVM.CategoryId);
             if (!result)
@@ -60,25 +64,119 @@ namespace Pronia.Areas.Admin.Controllers
                     return View();
                 }
             }
-            Product product = new Product
+			if (productVM.CategoryId == 0)
+			{
+				ModelState.AddModelError("AuthorId", "You must choose Author");
+				productVM.Categories = await _context.Categories.ToListAsync();
+				productVM.Tags = await _context.Tags.ToListAsync();
+
+				return View(productVM);
+			}
+
+
+			if (await _context.Categories.FirstOrDefaultAsync(x => x.Id == productVM.CategoryId) is null)
+			{
+				ModelState.AddModelError("AuthorId", "This Author is not exist");
+				productVM.Categories = await _context.Categories.ToListAsync();
+				productVM.Tags = await _context.Tags.ToListAsync();
+
+				return View(productVM);
+			}
+            if (productVM.MainPhoto.ValidateType("image/"))
+            {
+                productVM.Categories=await _context.Categories.ToListAsync();
+                productVM.Tags = await _context.Tags.ToListAsync();
+                ModelState.AddModelError("MainPhoto", "Invalid file type.");
+				return View(productVM);
+            }
+
+            if (!productVM.MainPhoto.ValidateSize(600))
+            {
+				productVM.Categories = await _context.Categories.ToListAsync();
+				productVM.Tags = await _context.Tags.ToListAsync();
+				ModelState.AddModelError("MainPhoto", "The file size is not appropriate");
+			}
+
+			if (productVM.MainPhoto.ValidateType("image/"))
+			{
+				productVM.Categories = await _context.Categories.ToListAsync();
+				productVM.Tags = await _context.Tags.ToListAsync();
+				ModelState.AddModelError("HoverPhoto", "Invalid file type.");
+				return View(productVM);
+			}
+
+			if (!productVM.MainPhoto.ValidateSize(600))
+			{
+				productVM.Categories = await _context.Categories.ToListAsync();
+				productVM.Tags = await _context.Tags.ToListAsync();
+				ModelState.AddModelError("HoverPhoto", "The file size is not appropriate");
+			}
+
+            ProductImage main = new ProductImage()
+            {
+                IsPrimary = true,
+                Url=await productVM.MainPhoto.CreateFileAsync(_env.WebRootPath,"assets","images","website-images"),
+                Alternative=productVM.Name
+            };
+
+			ProductImage hover = new ProductImage()
+			{
+				IsPrimary = false,
+				Url = await productVM.MainPhoto.CreateFileAsync(_env.WebRootPath, "assets", "images", "website-images"),
+				Alternative = productVM.Name
+			};
+			Product product = new Product
             {
                 Name = productVM.Name,
                 Price = productVM.Price,
                 Description = productVM.Description,
                 SKU = productVM.SKU,
                 CategoryId = (int)productVM.CategoryId,
-                ProductTags=new List<ProductTag>()
+                ProductTags=new List<ProductTag>(),
+                ProductImages=new List<ProductImage> { main,hover }
             };
-            List<ProductTag> productTags = new List<ProductTag>();
-            foreach (int tagId in productVM.TagIds)
+
+            TempData["Message"] = "";
+            foreach (IFormFile photo in productVM.Photos ?? new List<IFormFile>())
             {
-                ProductTag productTag = new ProductTag()
+                if (!photo.ValidateType("image/"))
                 {
-                    TagId = tagId,
-                };
-                product.ProductTags.Add(product);
+                    TempData["Message"] += $"<p class=\"text-danger\">{photo.FileName} file type does not match</p>";
+                    continue;
+                }
+                if (!productVM.HoverPhoto.ValidateSize(600))
+                {
+					TempData["Message"] += $"<p class=\"text-danger\">{photo.FileName} file size is not appropriate</p>";
+					continue;
+                }
+
+                product.ProductImages.Add(new ProductImage
+                {
+                    IsPrimary = null,
+                    Alternative = product.Name,
+                    Url = await photo.CreateFileAsync(_env.WebRootPath, "assets", "images", "website-images")
+                });
             }
-            await _context.Products.AddAsync(product);
+			if (productVM.TagIds is not null)
+			{
+				foreach (var item in productVM.TagIds)
+				{
+					if (!await _context.Tags.AnyAsync(x => x.Id == item))
+					{
+						ModelState.AddModelError("TagIds", "This tag is not exist");
+						productVM.Categories = await _context.Categories.ToListAsync(); //Müəllim nəyə görə biz burda eyni vaxtda həm categories hem de tagı yoxlayırıq.// 
+						productVM.Tags = await _context.Tags.ToListAsync();
+
+						return View(productVM);
+					}
+				}
+
+				foreach (var item in productVM.TagIds)
+				{
+					product.ProductTags.Add(new ProductTag { TagId = item });
+				}
+			}
+			await _context.Products.AddAsync(product);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
@@ -118,39 +216,22 @@ namespace Pronia.Areas.Admin.Controllers
             {
                 ModelState.AddModelError("CategoryId", "The categoryid is not exist.");
             }
-            if(productVM.Photo is not null)
-            {
-				if (!productVM.Photo.ValidateType("images/"))
-				{
-					
-					ModelState.AddModelError("Photo", "The file type is not compatible.");
-					return View(productVM);
-				}
-				if (productVM.Photo.ValidateSize(2 * 1024))
-				{
-					
-					ModelState.AddModelError("Photo", "File size should not exceed 2 megabytes.");
-					return View(productVM);
-				}
-                string fileName = await productVM.Photo.CreateFileAsync(_env.WebRootPath, "assets", "images", "web-images");
-                existed.ProductImages.DeleteFile(_env.WebRootPath, "assets", "images", "web-images");
-                existed.ProductImages = fileName;
 
-            }
+            existed.ProductTags.RemoveAll(pt=>!productVM.TagIds.Exists(tId=>tId==pt.TagId));
 
-            foreach (ProductTag pTag in existed.ProductTags)
+            List<int> creatable=productVM.TagIds.Where(tId=>!existed.ProductTags.Exists(pt=>pt.TagId==tId)).ToList();
+            foreach (int tId in creatable)
             {
-                if (!productVM.TagIds.existed(tId => tId == pTag.TagId))
+                bool tagResult = await _context.Tags.AnyAsync(t => t.Id == tId);
+                if (!tagResult)
                 {
-                    _context.ProductTags.Remove(pTag);
+					productVM.Categories = await _context.Categories.ToListAsync();
+					productVM.Tags = await _context.Tags.ToListAsync();
+                    ModelState.AddModelError("TagIds", "The Tag is not exist.");
+
+					return View(productVM);
                 }
-            }
-            foreach(int tId in productVM.TagIds)
-            {
-                if (existed.ProductTags.Any(pt => pt.tagId == tId))
-                {
-                    existed.ProductTags.Add(new ProductTag { TagId = tId });
-                }
+                existed.ProductTags.Add(new ProductTag { TagId = tId });
             }
             existed.Name = productVM.Name;
             existed.Price = productVM.Price;
@@ -176,6 +257,10 @@ namespace Pronia.Areas.Admin.Controllers
 			if (id <= 0) return BadRequest();
 
 			Product detail = await _context.Products
+                .Include(p=>p.Category)
+                .Include(p=>p.ProductImages)
+                .Include(p=>p.ProductTags)
+                .ThenInclude(pt=>pt.Tag)
                 .FirstOrDefaultAsync(s => s.Id == id);
 			if (detail == null) NotFound();
 

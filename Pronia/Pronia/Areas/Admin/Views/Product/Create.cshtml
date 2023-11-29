@@ -11,6 +11,21 @@
 						
 						<form class="forms-sample" method="post" enctype="multipart/form-data">
 							<div class="form-group">
+								<label asp-for="MainPhoto">Main Image</label>
+								<input asp-for="MainPhoto" class="form-control" accept="image/*" >
+								<span class="text-danger" asp-validation-for="MainPhoto"></span>
+							</div>
+							<div class="form-group">
+								<label asp-for="HoverPhoto">Hover Image</label>
+								<input asp-for="HoverPhoto" class="form-control" accept="image/*">
+								<span class="text-danger" asp-validation-for="HoverPhoto"></span>
+							</div>
+							<div class="form-group">
+								<label asp-for="Photos">Additional Images</label>
+								<input asp-for="Photos" class="form-control" accept="image/*">
+								<span class="text-danger" asp-validation-for="Photos"></span>
+							</div>
+							<div class="form-group">
 								<label asp-for="Name">Name</label>
 								<input asp-for="Name" class="form-control" placeholder="Name">
 								<span class="text-danger" asp-validation-for="Name"></span>
@@ -29,14 +44,14 @@
 							<div class="form-group">
 								<label asp-for="CategoryId">Category</label>
 								
-								<select asp-for="CategoryId" class="form-control" asp-items="new SelectList(productVM.Tags,nameof(Category.Id),nameof(Category.Name))">
+								<select asp-for="CategoryId" class="form-control" asp-items="new SelectList(Model.Categories,nameof(Category.Id),nameof(Category.Name))">
 									<option disabled selected>Choose Category</option> 
 								</select>
 								<span class="text-danger" asp-validation-for="CategoryId"></span>
 							</div>
 							<div class="form-group">
 								<label asp-for="TagIds">Tags</label>
-								<select asp-for="TagIds" class="form-control" asp-items="new SelectList(productVM.Tags,nameof(Tag.Id),nameof(Tag.Name))">
+								<select asp-for="TagIds" class="form-control" asp-items="new SelectList(Model.Tags,nameof(Tag.Id),nameof(Tag.Name))">
 								</select>
 								<span class="text-danger" asp-validation-for="TagIds"></span>
 							</div>

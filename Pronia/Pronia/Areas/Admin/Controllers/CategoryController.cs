@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Pronia.Areas.Admin.ViewModels;
-using Pronia.Areas.Admin.ViewModels.Category;
+
 using Pronia.DAL;
 using Pronia.Models;
 
