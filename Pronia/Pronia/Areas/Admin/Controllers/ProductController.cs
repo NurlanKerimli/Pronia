@@ -256,9 +256,6 @@ namespace Pronia.Areas.Admin.Controllers
                 bool tagResult = await _context.Tags.AnyAsync(t => t.Id == tId);
                 if (!tagResult)
                 {
-					productVM.Categories = await _context.Categories.ToListAsync();
-					productVM.Tags = await _context.Tags.ToListAsync();
-                    productVM.ProductImages=existed.ProductImages;
                     ModelState.AddModelError("TagIds", "The Tag is not exist.");
 
 					return View(productVM);
@@ -297,7 +294,7 @@ namespace Pronia.Areas.Admin.Controllers
             {
                 productVM.ImageIds = new List<int>();
             }
-            List<ProductImage> removeable = existed.ProductImages.Where(pi => !productVM.ImageIds.Exists(imgId => imgId=pi.Id)&&pi.IsPrimary==true).ToList();
+            List<ProductImage> removeable = existed.ProductImages.Where(pi => !productVM.ImageIds.Exists(imgId => imgId==pi.Id)&&pi.IsPrimary==true).ToList();
             foreach(ProductImage removedImg in removeable)
             {
                 removedImg.Url.DeleteFile(_env.WebRootPath, "assets", "images", "website-images");

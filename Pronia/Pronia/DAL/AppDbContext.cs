@@ -21,5 +21,6 @@ namespace Pronia.DAL
         public DbSet<ProductSize> ProductSizes { get; set; }
         public DbSet<Color> Colors { get; set; }
         public DbSet<ProductColor> ProductColors { get; set; }
+        public DbSet<Setting> Settings { get; set; }
     }
 }

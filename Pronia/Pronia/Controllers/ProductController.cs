@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Pronia.DAL;
 using Pronia.Models;
+using Pronia.ViewModels;
 
 namespace Pronia.Controllers
 {
@@ -20,10 +21,24 @@ namespace Pronia.Controllers
         public async Task<IActionResult> Detail(int id)
         {
             if (id <= 0) return BadRequest();
-            Product product = await _context.Products.Include(p => p.ProductImages).FirstOrDefaultAsync(P => P.Id == id);
-            if (product is null) return NotFound();
+            Product product = await _context.Products
+                .Include(p=>p.Category)
+                .Include(p => p.ProductImages)
+                .Include(p=>p.ProductTags)
+                .FirstOrDefaultAsync(P => P.Id == id);
+			if (product is null) return NotFound();
+			DetailVM detailVM = new DetailVM()
+            {
+                Product = product,
+                RelatedProducts =await _context.Products
+                .Where(p=>p.CategoryId==product.CategoryId && p.Id!=product.Id)
+                .Take(12)
+                .Include(p=>p.ProductImages.Where(pi=>pi.IsPrimary!=null))
+                .ToListAsync()
+            };
+            
 
-            return View(product);
+            return View(detailVM);
 
 
         }

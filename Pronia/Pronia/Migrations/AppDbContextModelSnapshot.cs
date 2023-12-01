@@ -32,7 +32,8 @@ namespace Pronia.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)");
 
                     b.HasKey("Id");
 
@@ -187,6 +188,27 @@ namespace Pronia.Migrations
                     b.ToTable("ProductTags");
                 });
 
+            modelBuilder.Entity("Pronia.Models.Setting", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Settings");
+                });
+
             modelBuilder.Entity("Pronia.Models.Size", b =>
                 {
                     b.Property<int>("Id")
@@ -316,7 +338,7 @@ namespace Pronia.Migrations
             modelBuilder.Entity("Pronia.Models.ProductTag", b =>
                 {
                     b.HasOne("Pronia.Models.Product", "Product")
-                        .WithMany("ProductTag")
+                        .WithMany("ProductTags")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -350,7 +372,7 @@ namespace Pronia.Migrations
 
                     b.Navigation("ProductSize");
 
-                    b.Navigation("ProductTag");
+                    b.Navigation("ProductTags");
                 });
 
             modelBuilder.Entity("Pronia.Models.Size", b =>
