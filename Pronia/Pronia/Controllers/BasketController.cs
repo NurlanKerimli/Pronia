@@ -88,6 +88,25 @@ namespace Pronia.Controllers
 		{
 			return Content(Request.Cookies["Basket"]);
 		}
+
+		public async Task<IActionResult> Remove(int id)
+		{
+			if (id <= 0) return BadRequest();
+			List<BasketCookieItemVM> basket;
+			if (Request.Cookies["Basket"] is null)
+			{
+				return RedirectToAction(nameof(Index));
+			}
+			basket = JsonConvert.DeserializeObject<List<BasketCookieItemVM>>(Request.Cookies["Basket"]);
+			BasketCookieItemVM removed=basket.FirstOrDefault(b=>b.Id==id);
+			if(removed != null)
+			{
+				basket.Remove(removed);
+			}
+			string json=JsonConvert.SerializeObject(basket);
+			Response.Cookies.Append("Basket", json);
+			return RedirectToAction(nameof(Index),"Home");
+		}
 	}
 
 }
