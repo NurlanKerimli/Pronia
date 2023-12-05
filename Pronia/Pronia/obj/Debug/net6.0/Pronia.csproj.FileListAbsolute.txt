@@ -263,3 +263,8 @@ D:\Users\nurlan\Documents\CodeAcademy resources\Tasks\Task -27\Pronia\Pronia\bin
 D:\Users\nurlan\Documents\CodeAcademy resources\Tasks\Task -27\Pronia\Pronia\bin\Debug\net6.0\tr\Microsoft.CodeAnalysis.Workspaces.resources.dll
 D:\Users\nurlan\Documents\CodeAcademy resources\Tasks\Task -27\Pronia\Pronia\bin\Debug\net6.0\zh-Hans\Microsoft.CodeAnalysis.Workspaces.resources.dll
 D:\Users\nurlan\Documents\CodeAcademy resources\Tasks\Task -27\Pronia\Pronia\bin\Debug\net6.0\zh-Hant\Microsoft.CodeAnalysis.Workspaces.resources.dll
+D:\Users\nurlan\Documents\CodeAcademy resources\Tasks\Task -27\Pronia\Pronia\bin\Debug\net6.0\Microsoft.AspNetCore.Cryptography.Internal.dll
+D:\Users\nurlan\Documents\CodeAcademy resources\Tasks\Task -27\Pronia\Pronia\bin\Debug\net6.0\Microsoft.AspNetCore.Cryptography.KeyDerivation.dll
+D:\Users\nurlan\Documents\CodeAcademy resources\Tasks\Task -27\Pronia\Pronia\bin\Debug\net6.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
+D:\Users\nurlan\Documents\CodeAcademy resources\Tasks\Task -27\Pronia\Pronia\bin\Debug\net6.0\Microsoft.Extensions.Identity.Core.dll
+D:\Users\nurlan\Documents\CodeAcademy resources\Tasks\Task -27\Pronia\Pronia\bin\Debug\net6.0\Microsoft.Extensions.Identity.Stores.dll

@@ -105,7 +105,7 @@ namespace Pronia.Controllers
 			}
 			string json=JsonConvert.SerializeObject(basket);
 			Response.Cookies.Append("Basket", json);
-			return RedirectToAction(nameof(Index),"Home");
+			return RedirectToAction(nameof(Index),"Basket");
 		}
 	}
 
