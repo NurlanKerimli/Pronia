@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Pronia.Areas.Admin.ViewModels;
 
@@ -10,6 +11,7 @@ using System.Collections.Generic;
 namespace Pronia.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    
     public class ProductController : Controller
     {
         private readonly AppDbContext _context;
@@ -19,7 +21,8 @@ namespace Pronia.Areas.Admin.Controllers
             _context = context;
             _env = env;
         }
-        public async  Task<IActionResult> Index()
+		[Authorize(Roles = "Admin,Moderator")]
+		public async  Task<IActionResult> Index()
         {
             List<Product> products = await _context.Products
                 .Include(p => p.Category)
@@ -29,8 +32,8 @@ namespace Pronia.Areas.Admin.Controllers
                 .ToListAsync();
             return View();
         }
-
-        public async Task<IActionResult> Create()
+		[Authorize(Roles = "Admin,Moderator")]
+		public async Task<IActionResult> Create()
         {
             CreateProductVM productVM = new CreateProductVM();
            
@@ -180,8 +183,8 @@ namespace Pronia.Areas.Admin.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-
-        public async Task<IActionResult> Update(int id)
+		[Authorize(Roles = "Admin,Moderator")]
+		public async Task<IActionResult> Update(int id)
         {
             Product existed = await _context.Products.Include(p=>p.ProductImages).Include(p=>p.ProductTags).FirstOrDefaultAsync(p=> p.Id ==id);
             if (existed == null) return NotFound();
@@ -328,8 +331,8 @@ namespace Pronia.Areas.Admin.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-
-        public async Task<IActionResult> Delete(int id)
+		[Authorize(Roles = "Admin")]
+		public async Task<IActionResult> Delete(int id)
         {
             if (id <= 0) return BadRequest();
             Product existed=await _context.Products.Include(p=>p.ProductImages.ToList()).FirstOrDefaultAsync(p=>p.Id==id);
