@@ -1,7 +1,10 @@
 ﻿@model Product
 
 <div class="card" style="width: 18rem;">
-	<img src="@Model.ProductImages" class="card-img-top" alt="...">
+	@foreach (var img in Model.ProductImages)
+	{
+		<img src="~/assets/images/website-images/@img.Url" class="card-img-top" alt="...">
+	}
 	<div class="card-body">
 		<h5 class="card-title">Title:@Model.Name</h5>
 		<h3 class="card-title">SubTitle:@Model.Price</h3>
@@ -9,9 +12,19 @@
 	</div>
 	<ul class="list-group list-group-flush">
 		<li class="list-group-item">Order:@Model.SKU</li>
-		<li class="list-group-item">Order:@Model.ProductSize</li>
-		<li class="list-group-item">Order:@Model.ProductTags</li>
-		<li class="list-group-item">Order:@Model.ProductColor</li>
+		@foreach (var item in Model.ProductSize)
+		{
+			<li class="list-group-item">Order:@item.Size.Name</li>
+		}
+
+		@foreach (var item in Model.ProductTags)
+		{
+			<li class="list-group-item">Order:@item.Tag.Name</li>
+		}
+		@foreach (var item in Model.ProductColor)
+		{
+			<li class="list-group-item">Order:@item.Color.Name</li>
+		}
 
 	</ul>
 	<div class="card-body">

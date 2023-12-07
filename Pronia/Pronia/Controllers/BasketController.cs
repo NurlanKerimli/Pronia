@@ -7,6 +7,7 @@ using Pronia.ViewModels;
 
 namespace Pronia.Controllers
 {
+	[AutoValidateAntiforgeryToken]
 	public class BasketController : Controller
 	{
 		private readonly AppDbContext _context;
@@ -89,7 +90,7 @@ namespace Pronia.Controllers
 			return Content(Request.Cookies["Basket"]);
 		}
 
-		public async Task<IActionResult> Remove(int id)
+		public IActionResult Remove(int id)
 		{
 			if (id <= 0) return BadRequest();
 			List<BasketCookieItemVM> basket;
@@ -107,6 +108,54 @@ namespace Pronia.Controllers
 			Response.Cookies.Append("Basket", json);
 			return RedirectToAction(nameof(Index),"Basket");
 		}
-	}
+		public IActionResult Plus(int id)
+		{
+			if (id <= 0) return BadRequest();
+			List<BasketCookieItemVM> basket = new List<BasketCookieItemVM>();
 
+			if (Request.Cookies["Basket"] is null)
+			{
+				return RedirectToAction(nameof(Index));
+			}
+
+			basket = JsonConvert.DeserializeObject<List<BasketCookieItemVM>>(Request.Cookies["Basket"]);
+			BasketCookieItemVM item = basket.FirstOrDefault(b => b.Id == id);
+
+			if (item != null)
+			{
+				item.Count++;
+			}
+
+			string json = JsonConvert.SerializeObject(basket);
+			Response.Cookies.Append("Basket", json);
+
+			return RedirectToAction(nameof(Index), "Basket");
+		}
+
+		public IActionResult Minus(int id)
+		{
+			if (id <= 0) return BadRequest();
+			List<BasketCookieItemVM> basket;
+
+			if (Request.Cookies["Basket"] is null)
+			{
+				return RedirectToAction(nameof(Index));
+			}
+
+			basket = JsonConvert.DeserializeObject<List<BasketCookieItemVM>>(Request.Cookies["Basket"]);
+			BasketCookieItemVM item = basket.FirstOrDefault(b => b.Id == id);
+
+			if (item != null && item.Count > 1)
+			{
+				item.Count--;
+			}
+
+			string json = JsonConvert.SerializeObject(basket);
+			Response.Cookies.Append("Basket", json);
+
+			return RedirectToAction(nameof(Index), "Basket");
+		}
+	}
 }
+
+

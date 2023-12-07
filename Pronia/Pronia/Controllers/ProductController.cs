@@ -6,6 +6,7 @@ using Pronia.ViewModels;
 
 namespace Pronia.Controllers
 {
+    [AutoValidateAntiforgeryToken]
     public class ProductController : Controller
     {
         private readonly AppDbContext _context;

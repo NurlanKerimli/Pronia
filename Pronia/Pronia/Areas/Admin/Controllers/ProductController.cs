@@ -11,7 +11,7 @@ using System.Collections.Generic;
 namespace Pronia.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    
+    [AutoValidateAntiforgeryToken]
     public class ProductController : Controller
     {
         private readonly AppDbContext _context;
@@ -30,7 +30,7 @@ namespace Pronia.Areas.Admin.Controllers
                 .Include(p=>p.ProductTags)
                 .ThenInclude(pt=>pt.Tag)
                 .ToListAsync();
-            return View();
+            return View(products);
         }
 		[Authorize(Roles = "Admin,Moderator")]
 		public async Task<IActionResult> Create()
@@ -40,7 +40,7 @@ namespace Pronia.Areas.Admin.Controllers
 
             productVM.Categories = await _context.Categories.ToListAsync();
             productVM.Tags= await _context.Tags.ToListAsync();
-            return View();
+            return View(productVM);
         }
         [HttpPost]
         public async Task<IActionResult> Create(CreateProductVM productVM)
@@ -54,18 +54,24 @@ namespace Pronia.Areas.Admin.Controllers
             bool result = await _context.Categories.AnyAsync(c => c.Id == productVM.CategoryId);
             if (!result)
             {
-				productVM.Categories = await _context.Categories.ToListAsync();
+				
                 ModelState.AddModelError("CategoryId", "This category does not exist");
-                return View();
-            }
+				productVM.Categories = await _context.Categories.ToListAsync();
+				productVM.Tags = await _context.Tags.ToListAsync();
+
+				return View(productVM);
+			}
             foreach(int tagId in productVM.TagIds)
             {
                 bool tagResult= await _context.Tags.AnyAsync(t => t.Id == tagId);
                 if (!tagResult)
                 {
                     ModelState.AddModelError("TagIds", "Tag details don't exist.");
-                    return View();
-                }
+					productVM.Categories = await _context.Categories.ToListAsync();
+					productVM.Tags = await _context.Tags.ToListAsync();
+
+					return View(productVM);
+				}
             }
 			if (productVM.CategoryId == 0)
 			{
@@ -85,7 +91,7 @@ namespace Pronia.Areas.Admin.Controllers
 
 				return View(productVM);
 			}
-            if (productVM.MainPhoto.ValidateType("image/"))
+            if (!productVM.MainPhoto.ValidateType("image/"))
             {
                 productVM.Categories=await _context.Categories.ToListAsync();
                 productVM.Tags = await _context.Tags.ToListAsync();
@@ -100,7 +106,7 @@ namespace Pronia.Areas.Admin.Controllers
 				ModelState.AddModelError("MainPhoto", "The file size is not appropriate");
 			}
 
-			if (productVM.MainPhoto.ValidateType("image/"))
+			if (!productVM.HoverPhoto.ValidateType("image/"))
 			{
 				productVM.Categories = await _context.Categories.ToListAsync();
 				productVM.Tags = await _context.Tags.ToListAsync();
@@ -108,7 +114,7 @@ namespace Pronia.Areas.Admin.Controllers
 				return View(productVM);
 			}
 
-			if (!productVM.MainPhoto.ValidateSize(600))
+			if (!productVM.HoverPhoto.ValidateSize(600))
 			{
 				productVM.Categories = await _context.Categories.ToListAsync();
 				productVM.Tags = await _context.Tags.ToListAsync();
@@ -125,7 +131,7 @@ namespace Pronia.Areas.Admin.Controllers
 			ProductImage hover = new ProductImage()
 			{
 				IsPrimary = false,
-				Url = await productVM.MainPhoto.CreateFileAsync(_env.WebRootPath, "assets", "images", "website-images"),
+				Url = await productVM.HoverPhoto.CreateFileAsync(_env.WebRootPath, "assets", "images", "website-images"),
 				Alternative = productVM.Name
 			};
 			Product product = new Product
@@ -204,7 +210,7 @@ namespace Pronia.Areas.Admin.Controllers
             };
             return View(productVM);
         }
-
+        [HttpPost]
         public async Task<IActionResult> Update(int id,UpdateProductVM productVM)
         {
 			Product existed = await _context.Products.Include(p=>p.ProductImages).Include(p => p.ProductTags).FirstOrDefaultAsync(p => p.Id == id);
@@ -335,7 +341,7 @@ namespace Pronia.Areas.Admin.Controllers
 		public async Task<IActionResult> Delete(int id)
         {
             if (id <= 0) return BadRequest();
-            Product existed=await _context.Products.Include(p=>p.ProductImages.ToList()).FirstOrDefaultAsync(p=>p.Id==id);
+            Product existed=await _context.Products.Include(p=>p.ProductImages).FirstOrDefaultAsync(p=>p.Id==id);
             if (existed==null) return NotFound();
             foreach (ProductImage image in existed.ProductImages ?? new List<ProductImage>())
             {
@@ -354,10 +360,14 @@ namespace Pronia.Areas.Admin.Controllers
 			Product detail = await _context.Products
                 .Include(p=>p.Category)
                 .Include(p=>p.ProductImages)
+                .Include(p=>p.ProductColor)
+                .ThenInclude(pc=>pc.Color)
+                .Include(s=>s.ProductSize)
+                .ThenInclude(ps=>ps.Size)
                 .Include(p=>p.ProductTags)
                 .ThenInclude(pt=>pt.Tag)
                 .FirstOrDefaultAsync(s => s.Id == id);
-			if (detail == null) NotFound();
+			if (detail == null) return NotFound();
 
 			return View(detail);
 

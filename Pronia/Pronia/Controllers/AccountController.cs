@@ -9,6 +9,7 @@ using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace Pronia.Controllers
 {
+	[AutoValidateAntiforgeryToken]
 	public class AccountController : Controller
 	{
 		private readonly UserManager<AppUser> _userManager;

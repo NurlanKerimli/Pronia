@@ -6,7 +6,7 @@ namespace Pronia.Utilities.Extensions
 	{
 		public static bool ValidateType( this IFormFile file,string type)
 		{
-			if (file.ContentType.Contains("images/"))
+			if (file.ContentType.Contains(type))
 			{
 				return true;
 			}

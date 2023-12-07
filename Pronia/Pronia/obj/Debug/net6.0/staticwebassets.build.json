@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "nkZCAWpIcTAuN9HTG3G92klJToIgIXdunKSdu4Vxjfo=",
+  "Hash": "E0S7FQomBcikRcazP/UB04bZexLdCWrHl2qTwrUfUrw=",
   "Source": "Pronia",
   "BasePath": "_content/Pronia",
   "Mode": "Default",
@@ -3519,23 +3519,6 @@
       "OriginalItemSpec": "wwwroot\\assets\\images\\website-images\\1-1-1820x443.jpg"
     },
     {
-      "Identity": "D:\\Users\\nurlan\\Documents\\CodeAcademy resources\\Tasks\\Task -27\\Pronia\\Pronia\\wwwroot\\assets\\images\\website-images\\1-1-270x300.jpg",
-      "SourceId": "Pronia",
-      "SourceType": "Discovered",
-      "ContentRoot": "D:\\Users\\nurlan\\Documents\\CodeAcademy resources\\Tasks\\Task -27\\Pronia\\Pronia\\wwwroot\\",
-      "BasePath": "_content/Pronia",
-      "RelativePath": "assets/images/website-images/1-1-270x300.jpg",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\assets\\images\\website-images\\1-1-270x300.jpg"
-    },
-    {
       "Identity": "D:\\Users\\nurlan\\Documents\\CodeAcademy resources\\Tasks\\Task -27\\Pronia\\Pronia\\wwwroot\\assets\\images\\website-images\\1-1-310x220.jpg",
       "SourceId": "Pronia",
       "SourceType": "Discovered",
@@ -3689,23 +3672,6 @@
       "OriginalItemSpec": "wwwroot\\assets\\images\\website-images\\1-2-120x120.webp"
     },
     {
-      "Identity": "D:\\Users\\nurlan\\Documents\\CodeAcademy resources\\Tasks\\Task -27\\Pronia\\Pronia\\wwwroot\\assets\\images\\website-images\\1-2-270x300.jpg",
-      "SourceId": "Pronia",
-      "SourceType": "Discovered",
-      "ContentRoot": "D:\\Users\\nurlan\\Documents\\CodeAcademy resources\\Tasks\\Task -27\\Pronia\\Pronia\\wwwroot\\",
-      "BasePath": "_content/Pronia",
-      "RelativePath": "assets/images/website-images/1-2-270x300.jpg",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\assets\\images\\website-images\\1-2-270x300.jpg"
-    },
-    {
       "Identity": "D:\\Users\\nurlan\\Documents\\CodeAcademy resources\\Tasks\\Task -27\\Pronia\\Pronia\\wwwroot\\assets\\images\\website-images\\1-2-310x220.jpg",
       "SourceId": "Pronia",
       "SourceType": "Discovered",
@@ -3823,23 +3789,6 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\assets\\images\\website-images\\1-3-120x120.webp"
-    },
-    {
-      "Identity": "D:\\Users\\nurlan\\Documents\\CodeAcademy resources\\Tasks\\Task -27\\Pronia\\Pronia\\wwwroot\\assets\\images\\website-images\\1-3-270x300.jpg",
-      "SourceId": "Pronia",
-      "SourceType": "Discovered",
-      "ContentRoot": "D:\\Users\\nurlan\\Documents\\CodeAcademy resources\\Tasks\\Task -27\\Pronia\\Pronia\\wwwroot\\",
-      "BasePath": "_content/Pronia",
-      "RelativePath": "assets/images/website-images/1-3-270x300.jpg",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\assets\\images\\website-images\\1-3-270x300.jpg"
     },
     {
       "Identity": "D:\\Users\\nurlan\\Documents\\CodeAcademy resources\\Tasks\\Task -27\\Pronia\\Pronia\\wwwroot\\assets\\images\\website-images\\1-3-310x220.jpg",
