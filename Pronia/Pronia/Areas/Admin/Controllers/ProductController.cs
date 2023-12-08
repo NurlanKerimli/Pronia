@@ -303,7 +303,7 @@ namespace Pronia.Areas.Admin.Controllers
             {
                 productVM.ImageIds = new List<int>();
             }
-            List<ProductImage> removeable = existed.ProductImages.Where(pi => !productVM.ImageIds.Exists(imgId => imgId==pi.Id)&&pi.IsPrimary==true).ToList();
+            List<ProductImage> removeable = existed.ProductImages.Where(pi => !productVM.ImageIds.Exists(imgId => imgId==pi.Id)&&pi.IsPrimary==null).ToList();
             foreach(ProductImage removedImg in removeable)
             {
                 removedImg.Url.DeleteFile(_env.WebRootPath, "assets", "images", "website-images");

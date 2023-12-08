@@ -68,11 +68,15 @@
                                             </td>
                                             <td class="quantity">
                                                 <div class="cart-plus-minus">
+                                                    <a asp-action="plus" asp-controller="basket" asp-route-id="@item.Id"></a>
                                                     <input class="cart-plus-minus-box"
                                                            value="@item.Count"
                                                            type="text" />
                                                     <div class="dec qtybutton">
-                                                        <i class="fa fa-minus"></i>
+                                                        <a asp-action="minus" asp-controller="basket" asp-route-id="@item.Id">
+                                                            <i class="fa fa-minus"></i>
+                                                        </a>
+                                                        
                                                     </div>
                                                     <div class="inc qtybutton">
                                                         <i class="fa fa-plus"></i>
