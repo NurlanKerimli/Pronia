@@ -25,7 +25,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-12">
-                    <form action="javascript:void(0)">
+                    <form method="post">
                         <div class="table-content table-responsive">
                             <table class="table">
                                 <thead>
@@ -67,20 +67,16 @@
                                                 <span class="amount">$@item.Price</span>
                                             </td>
                                             <td class="quantity">
-                                                <div class="cart-plus-minus">
-                                                    <a asp-action="plus" asp-controller="basket" asp-route-id="@item.Id"></a>
-                                                    <input class="cart-plus-minus-box"
-                                                           value="@item.Count"
-                                                           type="text" />
-                                                    <div class="dec qtybutton">
-                                                        <a asp-action="minus" asp-controller="basket" asp-route-id="@item.Id">
-                                                            <i class="fa fa-minus"></i>
-                                                        </a>
-                                                        
-                                                    </div>
-                                                    <div class="inc qtybutton">
+                                                <div class="btn-group" role="group">
+                                                    <a type="button" class="btn btn-outline-success" asp-action="minus" asp-controller="basket" asp-route-id="@item.Id">
+                                                        <i class="fa fa-minus"></i>
+                                                    </a>
+                                                    <button type="button" class="btn btn-outline-success" disabled>
+                                                        @item.Count
+                                                    </button>
+                                                    <a type="button" class="btn btn-outline-success" asp-action="plus" asp-controller="basket" asp-route-id="@item.Id">
                                                         <i class="fa fa-plus"></i>
-                                                    </div>
+                                                    </a>
                                                 </div>
                                             </td>
                                             <td class="product-subtotal">
@@ -134,3 +130,6 @@
         </div>
     </div>
 </main>
+
+
+
