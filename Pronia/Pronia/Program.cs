@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Pronia.DAL;
 using Pronia.Interfaces;
+using Pronia.Middlewares;
 using Pronia.Models;
 using Pronia.Services;
 
@@ -28,6 +29,8 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
     options.Lockout.MaxFailedAccessAttempts = 3;
     options.Lockout.DefaultLockoutTimeSpan=TimeSpan.FromMinutes(5);
     options.Lockout.AllowedForNewUsers = true;
+
+    
 }).AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
 builder.Services.AddSingleton<IHttpContextAccessor,HttpContextAccessor>();
 builder.Services.AddScoped<LayoutService>();
@@ -39,7 +42,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseSession();
 app.UseStaticFiles();
-
+app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllerRoute(

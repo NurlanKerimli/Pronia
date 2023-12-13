@@ -107,7 +107,7 @@
 									<a href="tel://@settings["Phone"]">@settings["Phone"]</a>
 								</div>
 
-								<a href="index.html" class="header-logo">
+								<a asp-action="index" asp-controller="home" class="header-logo">
 									<img src="~/assets/images/logo/@settings["Logo"]" alt="Header Logo" />
 								</a>
 
@@ -145,6 +145,9 @@
 												{
 													<li>
 														<a class="dropdown-item" asp-action="register" asp-controller="account" asp-route-returnurl="@Context.Request.Path.Value">Register</a>
+													</li>
+													<li>
+														<a class="dropdown-item" asp-action="login" asp-controller="account" asp-route-returnurl="@Context.Request.Path.Value">Login</a>
 													</li>
 												}
 											</ul>
@@ -1077,7 +1080,7 @@
 
 	<!--Main JS (Common Activation Codes)-->
 	<script src="~/assets/js/main.js"></script>
-	<script src="~/assets/js/basketfetch.js"></script>
+	
 
 
 

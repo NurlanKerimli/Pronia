@@ -19,6 +19,7 @@ namespace Pronia.Controllers
         }
         public async Task<IActionResult> Index()
         {
+            throw new Exception("Exception");
 
             List<Slide> slides =await _context.Slides.OrderBy(s => s.Order).ToListAsync();
 			List<Product> products =await _context.Products.Take(4)
@@ -39,6 +40,10 @@ namespace Pronia.Controllers
         public IActionResult About()
         {
             return View();
+        }
+        public IActionResult ErrorPage(string error= "An error occurred.")
+        {
+            return View(model:error);
         }
 
       

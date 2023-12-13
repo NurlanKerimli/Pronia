@@ -16,10 +16,19 @@ namespace Pronia.Areas.Admin.Controllers
         {
             _context = context;
         }
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page=1)
         {
-            List<Category> categories= await _context.Categories.ToListAsync();
-            return View(categories);
+            int count=await _context.Categories.CountAsync();
+            ViewBag.TotalPage = Math.Ceiling((double)count / 3);
+            ViewBag.CurrentPage = page;
+            List<Category> categories= await _context.Categories.Skip((page-1)*3).Take(3).ToListAsync();
+            PaginateVM<Category> paginateVM = new PaginateVM<Category>
+            {
+                Items = categories,
+                TotalPage = Math.Ceiling((double)count / 3),
+                CurrentPage=page
+            };
+            return View(paginateVM);
         }
         public async Task<IActionResult> Create()
         {
